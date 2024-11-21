@@ -1,3 +1,6 @@
+import type { NextApiRequest, NextApiResponse } from 'next';
+
+
 const SERVICE_WORKER_FILE_PATH = './sw.js';
 
 export function notificationUnsupported(): boolean {
@@ -88,4 +91,20 @@ export async function sendWebPush(message: string | null): Promise<void> {
   });
   const result = await res.json();
   console.log(result);
+}
+
+// Handler pour le cron job de Vercel
+
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  try {
+    console.log('Cron Job Triggered: Envoi d\'une notification planifiée.');
+
+    // Appeler votre fonction de notification
+    await sendWebPush('Notification envoyée par Vercel Cron Job');
+
+    res.status(200).json({ success: true, message: 'Notification envoyée avec succès.' });
+  } catch (error) {
+    console.error('Erreur lors de l\'exécution du cron job :', error);
+    res.status(500).json({ success: false, error: 'Erreur lors de l\'exécution du cron job.' });
+  }
 }
